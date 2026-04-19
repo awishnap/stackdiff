@@ -45,6 +45,14 @@ def test_list_multiple(prof_dir):
     assert list_profiles(base=prof_dir) == ["alpha", "beta"]
 
 
+def test_list_sorted(prof_dir):
+    """Profiles should be returned in sorted order regardless of creation order."""
+    save_profile("zebra", {}, base=prof_dir)
+    save_profile("apple", {}, base=prof_dir)
+    save_profile("mango", {}, base=prof_dir)
+    assert list_profiles(base=prof_dir) == ["apple", "mango", "zebra"]
+
+
 def test_delete_profile(prof_dir):
     save_profile("temp", {"x": 1}, base=prof_dir)
     delete_profile("temp", base=prof_dir)
