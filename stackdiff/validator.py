@@ -27,6 +27,11 @@ class ValidationResult:
             lines.append(f"Type mismatch [{key}]: {msg}")
         return "\n".join(lines) if lines else "OK"
 
+    def raise_if_invalid(self) -> None:
+        """Raise ValidationError with the summary message if validation failed."""
+        if not self.valid:
+            raise ValidationError(self.summary())
+
 
 def validate_required(config: Dict, required_keys: Iterable[str]) -> ValidationResult:
     """Check that all required_keys are present in config."""
