@@ -21,8 +21,11 @@ def cmd_save(args: argparse.Namespace) -> None:
     try:
         with open(args.file) as fh:
             data = json.load(fh)
-    except (OSError, json.JSONDecodeError) as exc:
-        print(f"error: {exc}", file=sys.stderr)
+    except OSError as exc:
+        print(f"error: cannot read file: {exc}", file=sys.stderr)
+        sys.exit(1)
+    except json.JSONDecodeError as exc:
+        print(f"error: invalid JSON in '{args.file}': {exc}", file=sys.stderr)
         sys.exit(1)
     path = save_profile(args.name, data, base=base)
     print(f"Profile '{args.name}' saved to {path}")
