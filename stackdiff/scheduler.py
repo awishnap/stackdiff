@@ -81,3 +81,24 @@ def mark_ran(schedules_dir: str, name: str) -> None:
             _save_raw(schedules_dir, entries)
             return
     raise SchedulerError(f"Schedule '{name}' not found.")
+
+
+def update_schedule(schedules_dir: str, name: str, **kwargs) -> None:
+    """Update fields of an existing schedule entry by name.
+
+    Raises SchedulerError if the schedule does not exist or if an
+    attempt is made to change the entry's name to one that already exists.
+    """
+    entries = _load_raw(schedules_dir)
+    for e in entries:
+        if e["name"] == name:
+            new_name = kwargs.get("name")
+            if new_name and new_name != name and any(x["name"] == new_name for x in entries):
+                raise SchedulerError(f"Schedule '{new_name}' already exists.")
+            invalid = [k for k in kwargs if k not in ScheduleEntry.__dataclass_fields__]
+            if invalid:
+                raise SchedulerError(f"Unknown field(s): {', '.join(invalid)}")
+            e.update(kwargs)
+            _save_raw(schedules_dir, entries)
+            return
+    raise SchedulerError(f"Schedule '{name}' not found.")
