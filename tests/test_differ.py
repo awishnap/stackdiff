@@ -67,3 +67,15 @@ def test_empty_configs():
     result = diff_configs({}, {})
     assert not result.has_diff
     assert result.summary() == "No differences found."
+
+
+def test_diff_configs_invalid_input_raises():
+    """diff_configs should raise TypeError when given non-dict arguments."""
+    with pytest.raises(TypeError):
+        diff_configs(None, TARGET)
+
+    with pytest.raises(TypeError):
+        diff_configs(BASE, None)
+
+    with pytest.raises(TypeError):
+        diff_configs("not a dict", TARGET)
