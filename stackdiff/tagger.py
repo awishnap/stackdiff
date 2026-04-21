@@ -71,3 +71,21 @@ def clear_tags(tags_dir: str, name: str) -> None:
     data = _load_raw(tags_dir)
     data.pop(name, None)
     _save_raw(tags_dir, data)
+
+
+def rename_tag(tags_dir: str, old_tag: str, new_tag: str) -> int:
+    """Rename *old_tag* to *new_tag* across all entries.
+
+    Returns the number of entries that were updated.
+    Raises TaggerError if *old_tag* does not exist on any entry.
+    """
+    data = _load_raw(tags_dir)
+    updated = 0
+    for name, tags in data.items():
+        if old_tag in tags:
+            tags[tags.index(old_tag)] = new_tag
+            updated += 1
+    if updated == 0:
+        raise TaggerError(f"Tag '{old_tag}' not found on any entry.")
+    _save_raw(tags_dir, data)
+    return updated
