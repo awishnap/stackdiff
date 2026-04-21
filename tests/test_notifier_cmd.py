@@ -27,6 +27,12 @@ def _args(**kwargs) -> argparse.Namespace:
     return argparse.Namespace(**defaults)
 
 
+def _write_json(path, data):
+    """Write *data* as JSON to *path* and return the path as a string."""
+    path.write_text(json.dumps(data))
+    return str(path)
+
+
 # ── build_notify_parser ────────────────────────────────────────────────────────
 
 def test_build_notify_parser_registers_subcommand():
@@ -50,8 +56,8 @@ def test_build_notify_parser_registers_subcommand():
 def test_cmd_test_dispatches_webhook(tmp_path):
     local_f = tmp_path / "local.json"
     remote_f = tmp_path / "remote.json"
-    local_f.write_text(json.dumps({"A": "1", "B": "2"}))
-    remote_f.write_text(json.dumps({"A": "1", "C": "3"}))
+    _write_json(local_f, {"A": "1", "B": "2"})
+    _write_json(remote_f, {"A": "1", "C": "3"})
 
     args = _args(local=str(local_f), remote=str(remote_f))
 
@@ -67,8 +73,8 @@ def test_cmd_test_dispatches_webhook(tmp_path):
 def test_cmd_test_below_threshold_no_call(tmp_path):
     local_f = tmp_path / "local.json"
     remote_f = tmp_path / "remote.json"
-    local_f.write_text(json.dumps({"A": "1"}))
-    remote_f.write_text(json.dumps({"A": "1"}))
+    _write_json(local_f, {"A": "1"})
+    _write_json(remote_f, {"A": "1"})
 
     args = _args(local=str(local_f), remote=str(remote_f), threshold=5)
 
@@ -89,8 +95,8 @@ def test_cmd_test_notify_error_exits(tmp_path):
 
     local_f = tmp_path / "l.json"
     remote_f = tmp_path / "r.json"
-    local_f.write_text(json.dumps({"X": "1"}))
-    remote_f.write_text(json.dumps({"Y": "2"}))
+    _write_json(local_f, {"X": "1"})
+    _write_json(remote_f, {"Y": "2"})
 
     args = _args(local=str(local_f), remote=str(remote_f))
 
