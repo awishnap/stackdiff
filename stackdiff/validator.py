@@ -32,6 +32,15 @@ class ValidationResult:
         if not self.valid:
             raise ValidationError(self.summary())
 
+    def merge(self, other: ValidationResult) -> ValidationResult:
+        """Return a new ValidationResult combining missing keys and type mismatches
+        from both this result and *other*.
+        """
+        return ValidationResult(
+            missing=list(set(self.missing) | set(other.missing)),
+            type_mismatches={**self.type_mismatches, **other.type_mismatches},
+        )
+
 
 def validate_required(config: Dict, required_keys: Iterable[str]) -> ValidationResult:
     """Check that all required_keys are present in config."""
@@ -62,9 +71,5 @@ def validate_config(config: Dict, required_keys: Iterable[str] = (), schema: Dic
     req_result = validate_required(config, required_keys)
     if schema:
         type_result = validate_types(config, schema)
-        merged = ValidationResult(
-            missing=list(set(req_result.missing) | set(type_result.missing)),
-            type_mismatches=type_result.type_mismatches,
-        )
-        return merged
+        return req_result.merge(type_result)
     return req_result
