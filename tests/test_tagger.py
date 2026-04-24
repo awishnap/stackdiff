@@ -51,6 +51,14 @@ def test_remove_missing_tag_raises(tag_dir):
         remove_tag(tag_dir, "prod", "ghost")
 
 
+def test_remove_tag_does_not_affect_other_tags(tag_dir):
+    """Removing one tag should leave other tags on the same name intact."""
+    add_tag(tag_dir, "prod", "critical")
+    add_tag(tag_dir, "prod", "live")
+    remove_tag(tag_dir, "prod", "critical")
+    assert list_tags(tag_dir, "prod") == ["live"]
+
+
 def test_find_by_tag_returns_matching_names(tag_dir):
     add_tag(tag_dir, "prod", "critical")
     add_tag(tag_dir, "staging", "critical")
