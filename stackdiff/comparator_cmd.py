@@ -7,6 +7,7 @@ import sys
 from stackdiff.comparator import (
     ComparatorError,
     ComparisonSpec,
+    delete_spec,
     list_specs,
     load_spec,
     run_comparison,
@@ -55,6 +56,16 @@ def cmd_run(args: argparse.Namespace) -> None:
         sys.exit(1)
 
 
+def cmd_delete(args: argparse.Namespace) -> None:
+    """Delete a saved comparison spec by name."""
+    try:
+        delete_spec(args.name, args.store_dir)
+        print(f"Deleted comparison spec '{args.name}'.")
+    except ComparatorError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        sys.exit(1)
+
+
 def build_comparator_parser(subparsers: argparse._SubParsersAction) -> None:  # type: ignore[type-arg]
     p = subparsers.add_parser("compare", help="Manage and run named config comparisons")
     sub = p.add_subparsers(dest="compare_cmd", required=True)
@@ -79,3 +90,9 @@ def build_comparator_parser(subparsers: argparse._SubParsersAction) -> None:  # 
     pr.add_argument("name")
     pr.add_argument("--store-dir", default=".stackdiff/comparisons")
     pr.set_defaults(func=cmd_run)
+
+    # delete
+    pd = sub.add_parser("delete", help="Delete a saved comparison spec")
+    pd.add_argument("name")
+    pd.add_argument("--store-dir", default=".stackdiff/comparisons")
+    pd.set_defaults(func=cmd_delete)
