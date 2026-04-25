@@ -88,6 +88,15 @@ def test_cmd_run_bad_file_exits(tmp_path):
         cmd_run(args)
 
 
+def test_cmd_run_invalid_json_exits(tmp_path):
+    """cmd_run should exit with a non-zero status when the file contains invalid JSON."""
+    bad_file = tmp_path / "bad.json"
+    bad_file.write_text("{not: valid json}")
+    args = _args(file=str(bad_file))
+    with pytest.raises(SystemExit):
+        cmd_run(args)
+
+
 def test_build_sorter_parser_registers_subcommand():
     root = argparse.ArgumentParser()
     sub = root.add_subparsers()
