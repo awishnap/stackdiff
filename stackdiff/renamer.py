@@ -78,3 +78,22 @@ def invert_mapping(mapping: Dict[str, str]) -> Dict[str, str]:
             )
         inverted[new] = old
     return inverted
+
+
+def filter_mapping(
+    mapping: Dict[str, str],
+    config: Dict[str, str],
+) -> Dict[str, str]:
+    """Return a copy of *mapping* containing only keys present in *config*.
+
+    Useful for applying a broad mapping to configs that only contain a
+    subset of the expected keys, without triggering strict-mode errors.
+
+    Args:
+        mapping: ``{old_key: new_key}`` pairs to filter.
+        config:  Config dict whose keys act as the filter.
+
+    Returns:
+        A new mapping restricted to keys that exist in *config*.
+    """
+    return {k: v for k, v in mapping.items() if k in config}
