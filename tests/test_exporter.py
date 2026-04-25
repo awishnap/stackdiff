@@ -29,6 +29,17 @@ def test_export_json_structure(result):
     assert data["unchanged"] == {"PORT": "8080"}
 
 
+def test_export_json_empty_diff():
+    """Ensure export_json handles a fully empty diff without errors."""
+    empty = DiffResult(added={}, removed={}, changed={}, unchanged={})
+    out = export_json(empty)
+    data = json.loads(out)
+    assert data["added"] == {}
+    assert data["removed"] == {}
+    assert data["changed"] == {}
+    assert data["unchanged"] == {}
+
+
 def test_export_csv_headers(result):
     out = export_csv(result)
     reader = csv.reader(io.StringIO(out))
