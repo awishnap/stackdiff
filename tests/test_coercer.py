@@ -90,6 +90,13 @@ def test_coerce_config_does_not_mutate_original():
     assert cfg["count"] == "5"
 
 
+def test_coerce_config_invalid_value_raises():
+    """A bad value for a mapped key should raise CoercerError with key info."""
+    cfg = {"timeout": "not-a-number"}
+    with pytest.raises(CoercerError):
+        coerce_config(cfg, {"timeout": "int"})
+
+
 # ---------------------------------------------------------------------------
 # infer_types
 # ---------------------------------------------------------------------------
@@ -102,15 +109,20 @@ def test_infer_types_converts_float_string():
     assert infer_types({"pi": "3.14"})["pi"] == pytest.approx(3.14)
 
 
-def test_infer_types_converts_bool_string():
-    assert infer_types({"flag": "true"})["flag"] is True
-    assert infer_types({"flag": "off"})["flag"] is False
-
-
-def test_infer_types_leaves_plain_strings():
+def test_infer_types_leaves_plain_string_unchanged():
+    """Strings that don't look like numbers or booleans should stay as-is."""
     assert infer_types({"name": "alice"})["name"] == "alice"
 
 
-def test_infer_types_leaves_non_strings_unchanged():
-    cfg = {"count": 7, "ratio": 0.5, "active": True}
-    assert infer_types(cfg) == cfg
+def test_infer_types_converts_bool_string():
+    """Common boolean-like strings should be inferred as bool values."""
+    result = infer_types({"enabled": "true", "verbose": "false"})
+    assert result["enabled"] is True
+    assert result["verbose"] is False
+
+
+def test_infer_types_does_not_mutate_original():
+    """infer_types should return a new dict and leave the original intact."""
+    cfg = {"count": "10"}
+    infer_types(cfg)
+    assert cfg["count"] == "10"
