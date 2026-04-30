@@ -47,6 +47,22 @@ class Heatmap:
     def top(self, n: int = 10) -> List[HeatmapEntry]:
         return self.entries[:n]
 
+    def filter_by_min_frequency(self, min_frequency: float) -> List[HeatmapEntry]:
+        """Return entries whose change frequency is at or above *min_frequency*.
+
+        Args:
+            min_frequency: A value between 0.0 and 1.0 (inclusive).
+
+        Returns:
+            A filtered list of :class:`HeatmapEntry` objects, preserving the
+            existing descending-frequency order.
+        """
+        if not 0.0 <= min_frequency <= 1.0:
+            raise HeatmapError(
+                f"min_frequency must be between 0.0 and 1.0, got {min_frequency!r}."
+            )
+        return [e for e in self.entries if e.frequency >= min_frequency]
+
 
 def build_heatmap(
     results: Sequence[DiffResult],
